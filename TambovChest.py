@@ -6,11 +6,10 @@ import time
 import sys
 
 VIDEO_FOLDER = "videos"
-BLACK_FILE = os.path.join(VIDEO_FOLDER, "black.mp4")  # черное видео
+BLACK_FILE = "black.mp4"  # черное видео
 
 # Все mp4 кроме черного
-videos = [os.path.join(VIDEO_FOLDER, f) for f in os.listdir(VIDEO_FOLDER) 
-          if f.endswith(".mp4") and f != "black.mp4"]
+videos = [os.path.join(VIDEO_FOLDER, f) for f in os.listdir(VIDEO_FOLDER) if f.endswith(".mp4")]
 
 instance = vlc.Instance("--fullscreen", "--no-video-deco", "--video-on-top")
 player = instance.media_player_new()
