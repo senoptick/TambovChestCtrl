@@ -6,12 +6,11 @@ import time
 import sys
 
 VIDEO_FOLDER = "videos"
-BLACK_FILE = "black.mp4"  # черное видео
+BLACK_FILE = "black.mp4"  #
 
-# Все mp4 кроме черного
 videos = [os.path.join(VIDEO_FOLDER, f) for f in os.listdir(VIDEO_FOLDER) if f.endswith(".mp4")]
 
-instance = vlc.Instance("--fullscreen", "--no-video-deco", "--video-on-top")
+instance = vlc.Instance("--fullscreen", "--no-video-deco", "--video-on-top", "--input-repeat=99999")
 player = instance.media_player_new()
 
 playlist = []
@@ -40,35 +39,36 @@ def play_video(path):
 
 generate_playlist()
 
-# Изначально показываем черный экран
 play_video(BLACK_FILE)
 
 while True:
-    if keyboard.is_pressed("1"):  # открыть крышку
-        if not lid_open:
-            lid_open = True
-            if current_index >= len(playlist):
-                last_video_previous_playlist = playlist[-1]
-                generate_playlist()
-                current_index = 0
-            play_video(playlist[current_index])
-        time.sleep(0.2)
-
-    if keyboard.is_pressed("2"):  # закрыть крышку
-        if lid_open:
-            lid_open = False
-            play_video(BLACK_FILE)
-            current_index += 1
-        time.sleep(0.2)
-
-    if keyboard.is_pressed("3"):  # выйти из программы
-        player.stop()
-        sys.exit(0)
-
-    # Зацикливание текущего видео
-    if lid_open and playlist:
-        state = player.get_state()
-        if state in [vlc.State.Ended, vlc.State.Stopped, vlc.State.Error]:
-            play_video(playlist[current_index % len(playlist)])
-
-    time.sleep(0.05)
+    event = keyboard.read_event()
+    if event.event_type == keyboard.KEY_DOWN:
+        
+        if event.name == "2":  
+            if not lid_open:
+                lid_open = True
+                if current_index >= len(playlist):
+                    last_video_previous_playlist = playlist[-1]
+                    generate_playlist()
+                    current_index = 0
+                play_video(playlist[current_index])
+            time.sleep(0.2)
+    
+        if event.name == "1": 
+            if lid_open:
+                lid_open = False
+                play_video(BLACK_FILE)
+                current_index += 1
+            time.sleep(0.2)
+    
+        if event.name == "3": 
+            player.stop()
+            sys.exit(0)
+    
+        if lid_open and playlist:
+            state = player.get_state()
+            if state in [vlc.State.Ended, vlc.State.Stopped, vlc.State.Error]:
+                play_video(playlist[current_index % len(playlist)])
+    
+        time.sleep(0.05)
